@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    container_name: bookstore_db
+    environment:
+      POSTGRES_DB: bookstore_db
+      POSTGRES_USER: bookstore_user
+      POSTGRES_PASSWORD: bookstore_pass
+    ports:
+      - "5432:5432"
+    networks:
+      - bookstore_net
+
+  app:
+    build: .
+    container_name: bookstore_app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - bookstore_net
+
+networks:
+  bookstore_net:
+    driver: bridge
