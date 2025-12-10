@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "api",
+    "djoser",
+    "rest_framework_simplejwt"
 ]
 
 MIDDLEWARE = [
@@ -55,6 +57,8 @@ TEMPLATES = [
         },
     },
 ]
+
+
 
 WSGI_APPLICATION = "bookstore.wsgi.application"
 
@@ -92,6 +96,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# settings.py (Adicione esta seção)
+
+# ----------------- CONFIGURAÇÕES DJOSER/JWT -----------------
+DJOSER = {
+    # Usa o modelo de usuário padrão do Django
+    'USER_ID_FIELD': 'id',
+    
+    # Define quais views de autenticação usar.
+    # Usaremos 'jwt' para login/logout baseado em tokens JWT.
+    'TOKEN_MODEL': None, # Desabilita o TokenModel legado
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': False, # Geralmente desabilitado para APIs
+    
+    # Define os serializers. É crucial se você customizar o modelo User.
+    'SERIALIZERS': {
+        'user_create': 'djoser.serializers.UserCreateSerializer', # Para registro
+        'user': 'djoser.serializers.UserSerializer', # Para visualização de perfil
+        # Adicione outros serializers conforme necessário (ex: password_reset)
+    }
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -114,3 +146,12 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
