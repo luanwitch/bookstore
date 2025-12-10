@@ -1,56 +1,38 @@
-name: Django CI
+name: Python application
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8, 3.9]
+
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: bookstore
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: secret
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
       with:
-        python-version: "3.13"
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies with Poetry
+    - name: Install poetry
       run: |
-      pip install poetry
-      poetry install
+        python -m ensurepip
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade poetry
+    - name: View poetry --help
+      run: poetry --help
 
-    - name: Wait for Postgres
-      run: |
-        until pg_isready -h localhost -p 5432; do
-          echo "Waiting for Postgres..."
-          sleep 2
-        done
+    - name: Install dependencies
+      shell: bash
+      run: python -m poetry install
 
-    - name: Run migrations
-      env:
-        DATABASE_URL: postgres://admin:secret@localhost:5432/bookstore
+    - name: Test
       run: |
-        python manage.py migrate
-
-    - name: Run tests
-      run: |
-        python manage.py test
+        poetry run python manage.py test
+@luanwitch
+Comment
