@@ -63,13 +63,13 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "bookstore",
-        "USER": "bookstore",
-        "PASSWORD": "bookstore",
-        "HOST": "db",  
-        "PORT": "5432",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'bookstore',
+        'USER': 'bookstore',
+        'PASSWORD': 'bookstore',
+        'HOST': 'db',  
+        'PORT': '5432',
     }
 }
 
